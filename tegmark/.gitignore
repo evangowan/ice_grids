@@ -1,0 +1,11 @@
+formatted_files
+gmt.history
+hex_grid
+hexagons*.gmt
+icosahedron
+points*.txt
+px-*.dat
+test.dat
+*.ps
+test_points.txt
+
