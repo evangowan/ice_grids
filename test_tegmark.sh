@@ -1,6 +1,8 @@
 #! /bin/bash
 
-tegmark_resolution=44
+# This script must be run after running create_selen_input.sh
+
+tegmark_resolution=60
 hexagon_file="tegmark/hexagons_${tegmark_resolution}.gmt"
 points_file="tegmark/points_${tegmark_resolution}.txt"
 
@@ -51,14 +53,12 @@ shift_up="-Y10"
 J_options="-JX${map_width}"
 R_options="-R${x_min}/${x_max}/${y_min}/${y_max}"
 
-plot=tegmark_test.ps
-
-gmt makecpt -Cwysiwyg -T0/4000/50 -I > thick_shades.cpt
-
-gmt psxy tegmark_hexagon_thickness.gmt ${shift_up} -BWeSn -B2000000  -K ${R_options} ${J_options} -Cthick_shades.cpt -L -P -Wthin,black > ${plot}
-
-#gmt psxy limits.gmt -O -R -J -P -Wthick,red >> ${plot}
 
 
-gmt psscale -X-1 -Y-3.5 -Dx9c/2c/9c/0.5ch -P -O -Bx1000f500+l"Ice Thickness (m)" --FONT_LABEL=14p -Cthick_shades.cpt -V  >> $plot
+gmt makecpt -CSCM/oslo -T0/5000/250 -I > thick_shades.cpt
+
+gmt begin tegmark_test pdf
+  gmt psxy tegmark_hexagon_thickness.gmt  -Bwesn -B2000000   -Cthick_shades.cpt -L  -Wthin,black 
+  gmt colorbar -DJBC+w7c/0.5c+h+   -Bxa1000f500+l"Ice Thickness (m)" -G0/4000 -Cthick_shades.cpt
+gmt end
 

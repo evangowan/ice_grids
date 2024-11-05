@@ -10,28 +10,10 @@ tegmark_resolution=60
 hexagon_file="tegmark/hexagons_${tegmark_resolution}.gmt"
 points_file="tegmark/points_${tegmark_resolution}.txt"
 
-time_interval=2500
-max_time=80000
+time_interval=20000
+max_time=20000
 
-# model
-north_america_model_number="Evan_54"
-eurasia_model_number="Evan_55"
-antarctica_model_number="Evan_52"
-patagonia_model_number="Evan_53"
-
-
-antarctica_model="${HOME}/icesheet/github/global/Antarctica/plots/${antarctica_model_number}/thickness" # location of netcdf files with thickness
-antarctica_projection="${HOME}/icesheet/github/global/Antarctica/projection_info.sh"
-
-eurasia_model="${HOME}/icesheet/github/global/Eurasia/plots/${eurasia_model_number}/thickness"
-eurasia_projection="${HOME}/icesheet/github/global/Eurasia/projection_info.sh"
-
-
-north_america_model="${HOME}/icesheet/github/global/North_America/plots/${north_america_model_number}/thickness"
-north_america_projection="${HOME}/icesheet/github/global/North_America/projection_info.sh"
-
-patagonia_model="${HOME}/icesheet/github/global/Patagonia/plots/${patagonia_model_number}/thickness"
-patagonia_projection="${HOME}/icesheet/github/global/Patagonia/projection_info.sh"
+source model_locations.sh
 
 # run antarctica
 
@@ -57,8 +39,6 @@ do
 	cat element_thickness.txt >> ${temp_dir}/${times}.txt
 
 done
-
-./selen_ice_input ${tegmark_resolution} ${max_time} ${time_interval}
 
 # run Eurasia
 
