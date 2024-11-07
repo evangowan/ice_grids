@@ -10,6 +10,9 @@ objfiles =  global_parameters.o grids.o read_icefile.o  find_flowline_fisher_ada
 
 NFDIR = /usr
 
+sh_grid: sh_grid.f90  hexagon_grid.o overlapping_polygon.o
+	$(FC) -o sh_grid $(FCFLAGS) sh_grid.f90  hexagon_grid.o overlapping_polygon.o
+
 define_sh_grid: define_sh_grid.f90
 	$(FC) -o define_sh_grid $(FCFLAGS) define_sh_grid.f90
 
