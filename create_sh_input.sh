@@ -25,9 +25,9 @@ gmt mapproject  ${polygon_file}  ${R_options} ${J_options} -C -F  > sh_projected
 gmt mapproject  ${points_file}  ${R_options} ${J_options} -C -F  > points_projected.txt
 
 
-#for times in $(seq 0 ${time_interval} ${max_time} )
-#do
-times=20000
+for times in $(seq 0 ${time_interval} ${max_time} )
+do
+
 	input_file=${antarctica_model}/${times}.nc
 
 	gmt grdconvert ${input_file} -Gtemp.bin=bf
@@ -36,18 +36,18 @@ times=20000
 
 	./sh_grid
 
-	mv sh_element_thickness.txt >> ${temp_dir}/${times}.txt
 
-#done
 
-exit 0
+	mv sh_element_thickness.txt ${temp_dir}/${times}_list.txt
 
-# run Eurasia
+done
+
+
 
 source ${eurasia_projection}
 
-gmt mapproject  ${hexagon_file}  ${R_options} ${J_options} -F  > hexagon_projected.gmt
-gmt mapproject  ${points_file}  ${R_options} ${J_options} -F  > points_projected.txt
+gmt mapproject  ${polygon_file}  ${R_options} ${J_options}  -F  > sh_projected.gmt
+gmt mapproject  ${points_file}  ${R_options} ${J_options}  -F  > points_projected.txt
 
 for times in $(seq 0 ${time_interval} ${max_time} )
 do
@@ -58,10 +58,10 @@ do
 
 	gmt grdinfo -C temp.bin=bf | sed 's/\t/\n/g' > file_info.txt
 
-	./tegmarkgrid ${tegmark_resolution}
+	./sh_grid
 
-	cat element_thickness.txt >> ${temp_dir}/${times}.txt
-
+	 paste --delimiters ' ' sh_element_thickness.txt ${temp_dir}/${times}_list.txt > temp.txt
+     mv temp.txt ${temp_dir}/${times}_list.txt
 done
 
 
@@ -70,8 +70,8 @@ done
 
 source ${north_america_projection}
 
-gmt mapproject  ${hexagon_file}  ${R_options} ${J_options} -F  > hexagon_projected.gmt
-gmt mapproject  ${points_file}  ${R_options} ${J_options} -F  > points_projected.txt
+gmt mapproject  ${polygon_file}  ${R_options} ${J_options}  -F  > sh_projected.gmt
+gmt mapproject  ${points_file}  ${R_options} ${J_options}  -F  > points_projected.txt
 
 for times in $(seq 0 ${time_interval} ${max_time} )
 do
@@ -82,9 +82,10 @@ do
 
 	gmt grdinfo -C temp.bin=bf | sed 's/\t/\n/g' > file_info.txt
 
-	./tegmarkgrid ${tegmark_resolution}
+	./sh_grid
 
-	cat element_thickness.txt >> ${temp_dir}/${times}.txt
+	 paste --delimiters ' ' sh_element_thickness.txt ${temp_dir}/${times}_list.txt > temp.txt
+     mv temp.txt ${temp_dir}/${times}_list.txt
 
 done
 
@@ -93,8 +94,8 @@ done
 
 source ${patagonia_projection}
 
-gmt mapproject  ${hexagon_file}  ${R_options} ${J_options} -F  > hexagon_projected.gmt
-gmt mapproject  ${points_file}  ${R_options} ${J_options} -F  > points_projected.txt
+gmt mapproject  ${polygon_file}  ${R_options} ${J_options}  -F  > sh_projected.gmt
+gmt mapproject  ${points_file}  ${R_options} ${J_options}  -F  > points_projected.txt
 
 for times in $(seq 0 ${time_interval} ${max_time} )
 do
@@ -105,10 +106,19 @@ do
 
 	gmt grdinfo -C temp.bin=bf | sed 's/\t/\n/g' > file_info.txt
 
-	./tegmarkgrid ${tegmark_resolution}
+	./sh_grid
 
-	cat element_thickness.txt >> ${temp_dir}/${times}.txt
+	 paste --delimiters ' ' sh_element_thickness.txt ${temp_dir}/${times}_list.txt > temp.txt
+     mv temp.txt ${temp_dir}/${times}_list.txt
 
 done
 
-./selen_ice_input ${tegmark_resolution} ${max_time} ${time_interval}
+awk '{print $1 + $2 + $3 + $4}' ${temp_dir}/0_list.txt > ${temp_dir}/0_temp.txt
+for times in $(seq 0 ${time_interval} ${max_time} )
+do
+
+	paste --delimiters ' '  ${temp_dir}/${times}_list.txt ${temp_dir}/0_temp.txt > temp.txt
+    mv temp.txt ${temp_dir}/${times}_list.txt
+	awk '{print $1 + $2 + $3 + $4 - $5}' ${temp_dir}/${times}_list.txt > ${temp_dir}/${times}.txt
+
+done
