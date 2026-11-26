@@ -33,7 +33,7 @@ program sh_grid
 
 	integer :: header_in_records, num_x, num_y, i, j, record_number, istat, num_points, polygon_counter
 	double precision :: x_min_grid, x_max_grid, y_min_grid, y_max_grid, z_min_grid, z_max_grid, dx, dy
-  	double precision :: x_min_local, x_max_local, y_min_local, y_max_local
+  	double precision :: x_min_local, x_max_local, y_min_local, y_max_local, volume
 	double precision :: x_min_poly, x_max_poly, y_min_poly, y_max_poly, area, area_ratio, hexagon_area
 	integer :: counter1, counter2, hex_counter, overlap_point_count, resolution, n, counter
 
@@ -142,6 +142,8 @@ program sh_grid
 	open(unit=element_unit, file=element_file, access="sequential", form="formatted", status="replace")
 
 	write(6,*) "looping through all the element polygons to see if there is ice in them"
+
+	volume = 0.0
 
 	grid_loop: do counter = 1, num_points
 
@@ -259,17 +261,25 @@ program sh_grid
 			end do
 		end do
 
+		
+
 		if(elements(counter)%ice_thickness > 1.0) THEN
 			call print_polygon(current_polygon(1:point_count),point_count, &
 				elements(counter)%ice_thickness, out_unit)
 
-
 		endif
+
+
 
 		write(element_unit,'(F7.1)') elements(counter)%ice_thickness
 
+		area = polygon_area(current_polygon(1:point_count), point_count)
+		volume = volume + elements(counter)%ice_thickness * area
 
 	end do grid_loop
+
+	write(6,*) "Total volume:", volume /1.0e9 /1e6
+	write(6,*) "Sea level equivalent volume:", volume * 0.910 / 361. / 1.0e6 / 1.0e6
 	close(unit=poly_unit)
 	close(unit=element_unit)
 	close(unit=out_unit)

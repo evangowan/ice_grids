@@ -2,7 +2,7 @@
 
 # This needs to be run after running the program './define_sh_grid 512'
 # This needs to be run after running the script topo_ETOPO2022.sh (or if you change it, a different topo script)
-topo=ETOPO2022
+topo=RTOPO
 ice_model=PALEOMIST_1
 
 temp_dir="ice_temp"
@@ -202,6 +202,7 @@ do
 #		time_append=$times
 #	fi
 
+
 	time_thousand=$(echo ${times} | awk '{print $1/1000}')
     if [ $time_thousand -lt 10 ]
 	then
@@ -210,10 +211,18 @@ do
 	fi
 
 
-
 	paste --delimiters ' '  ${temp_dir}/${times}_temp.txt ${temp_dir}/${last_time}_temp.txt > temp.txt
 
-	awk '{print $2 - $1}' temp.txt > ${ice_model}/${ice_model}_${time_thousand}
+	if [ ${times} -eq ${max_time} ]
+	then
+		awk '{print ($2 - $1) / 5}' temp.txt > ${ice_model}/${ice_model}_${time_thousand}
+	else
+
+		awk '{print ($2 - $1) / 1}' temp.txt > ${ice_model}/${ice_model}_${time_thousand}
+		cp temp.txt temp_test/${times}_${last_time}.txt
+
+	fi
+	
 
 	last_time=${times}
 
